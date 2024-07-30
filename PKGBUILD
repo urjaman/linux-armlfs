@@ -14,8 +14,8 @@ pkgbase=linux-armlfs${_xname}
 _srcname=linux-6.10
 _kernelname=${pkgbase#linux}
 _desc="Veyron Speedy"
-pkgver=6.10.1
-pkgrel=1
+pkgver=6.10.2
+pkgrel=3
 arch=('armv7h')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -145,7 +145,7 @@ _package-chromebook() {
   cp ../kernel.its .
   mkimage -D "-I dts -O dtb -p 2048" -f kernel.its vmlinux.uimg || true
   dd if=/dev/zero of=bootloader.bin bs=512 count=1
-  echo 'console=tty0 init=/sbin/init root=PARTUUID=%U/PARTNROFF=1 rootwait rw noinitrd' > cmdline
+  echo 'console=ttyS2,115200n8 console=tty0 init=/sbin/init root=PARTUUID=%U/PARTNROFF=1 rootwait rw noinitrd' > cmdline
   vbutil_kernel \
     --pack vmlinux.kpart \
     --version 1 \
@@ -168,10 +168,10 @@ for _p in ${pkgname[@]}; do
 done
 
 sha256sums=('774698422ee54c5f1e704456f37c65c06b51b4e9a8b0866f34580d86fef8e226'
-            '101689f5d5d98d1adaf90ec3f334524848513d53dc40341f1f5c4809f0390549'
-            '6705b9921ac4574a5fb95f3d3959a483ca2c364c35f3de1ce1bf57ce8e16a5c3'
-            '9e6979121d1f3067561d1fe3e1914a36ac0e06197293a94f09d2405d36698f4a'
+            'f3166b9b9f6a7dbae9ed7e92e373c8ddb672c5bd2da3991207aa30f52ceda7fa'
+            'cb7604e70e47c32840e3555871ae7b85193d4348834e8c7baf0b0c28796f68cf'
+            '994aee74b13313bdc7c47df4d621c890f5ee52bc18f6c7b658de215c17423b2a'
             '4e708c9ec43ac4a5d718474c9431ba6b6da3e64a9dda6afd2853a9e9e3079ffb'
             'bc9e707a86e55a93f423e7bcdae4a25fd470b868e53829b91bbe2ccfbc6da27b'
             'ae2e95db94ef7176207c690224169594d49445e04249d2499e9d2fbc117a0b21'
-            'SKIP')
+            '91b60d81760bf349abc4fcc8e7660269ed5fc996a636a1b88b5328256b5c6772')

@@ -1,4 +1,4 @@
-From 146bb7f76db2934f32313d8e69dd3adfbc46699a Mon Sep 17 00:00:00 2001
+From 351552ca316e279db9c47a6353d7b8adec7a3631 Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Mon, 27 Aug 2018 10:30:55 +0000
 Subject: [PATCH 01/33] drivers: clk-rk3288: support for dedicating NPLL to a
@@ -13,7 +13,7 @@ Signed-off-by: Urja Rannikko <urjaman@gmail.com>
  2 files changed, 60 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
-index baa5aebd327..11493f0be2b 100644
+index baa5aebd3277..11493f0be2b1 100644
 --- a/drivers/clk/rockchip/clk-rk3288.c
 +++ b/drivers/clk/rockchip/clk-rk3288.c
 @@ -195,10 +195,14 @@ PNAME(mux_ddrphy_p)		= { "dpll_ddr", "gpll_ddr" };
@@ -149,7 +149,7 @@ index baa5aebd327..11493f0be2b 100644
  	if (IS_ERR(ctx)) {
  		pr_err("%s: rockchip clk init failed\n", __func__);
 diff --git a/drivers/clk/rockchip/clk.h b/drivers/clk/rockchip/clk.h
-index fd3b476dedd..878693518ee 100644
+index fd3b476dedda..878693518ee4 100644
 --- a/drivers/clk/rockchip/clk.h
 +++ b/drivers/clk/rockchip/clk.h
 @@ -510,6 +510,9 @@ struct clk *rockchip_clk_register_muxgrf(const char *name,
@@ -166,7 +166,7 @@ index fd3b476dedd..878693518ee 100644
 2.44.0
 
 
-From 4ca39aa40451eb8556752ad746581b8a51e21dd3 Mon Sep 17 00:00:00 2001
+From 3930ab3228d62714c2aac87ce2d0c922a450c8b8 Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Wed, 22 Aug 2018 18:36:40 +0000
 Subject: [PATCH 02/33] drm: dw_hdmi-rockchip: better clock selection logic and
@@ -199,7 +199,7 @@ Signed-off-by: Maya Matuszczyk <maccraft123mc@gmail.com>
  1 file changed, 166 insertions(+), 113 deletions(-)
 
 diff --git a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
-index fe33092abbe..42576b4807c 100644
+index fe33092abbe7..42576b4807cf 100644
 --- a/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
 +++ b/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c
 @@ -80,8 +80,13 @@ struct rockchip_hdmi {
@@ -617,7 +617,7 @@ index fe33092abbe..42576b4807c 100644
 2.44.0
 
 
-From 5ccbb77537508c5ab8a344dfd3a1f2e17e01e46c Mon Sep 17 00:00:00 2001
+From e4e0ebcb6fc680ca8cef8cbb22fe8b5ff4f8d7bb Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Mon, 27 Aug 2018 19:00:50 +0000
 Subject: [PATCH 03/33] dts: rk3288: support for dedicating npll to a vop
@@ -632,7 +632,7 @@ Signed-off-by: Urja Rannikko <urjaman@gmail.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288.dtsi b/arch/arm/boot/dts/rockchip/rk3288.dtsi
-index 3f1d640afaf..2992c323d55 100644
+index 3f1d640afafa..2992c323d555 100644
 --- a/arch/arm/boot/dts/rockchip/rk3288.dtsi
 +++ b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 @@ -876,12 +876,14 @@
@@ -656,7 +656,7 @@ index 3f1d640afaf..2992c323d55 100644
 2.44.0
 
 
-From 5ac6ce85753572b16dec98d53cbb2850cf6d8f6c Mon Sep 17 00:00:00 2001
+From 49029855f01e3e2e0a49bfb87823ed7a1e1d0386 Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Mon, 27 Aug 2018 19:03:49 +0000
 Subject: [PATCH 04/33] dts: rk3288-veyron-chromebook: dedicate npll to
@@ -673,7 +673,7 @@ Signed-off-by: Urja Rannikko <urjaman@gmail.com>
  1 file changed, 62 insertions(+)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288-veyron-chromebook.dtsi b/arch/arm/boot/dts/rockchip/rk3288-veyron-chromebook.dtsi
-index 092316be67f..e4d5c024065 100644
+index 092316be67f7..e4d5c0240657 100644
 --- a/arch/arm/boot/dts/rockchip/rk3288-veyron-chromebook.dtsi
 +++ b/arch/arm/boot/dts/rockchip/rk3288-veyron-chromebook.dtsi
 @@ -83,6 +83,68 @@
@@ -749,7 +749,7 @@ index 092316be67f..e4d5c024065 100644
 2.44.0
 
 
-From 20d84e518c829981b5321da2d331097d4fa2f423 Mon Sep 17 00:00:00 2001
+From cae09e9064b8556660bcf9231ee7222bf939958c Mon Sep 17 00:00:00 2001
 From: SolidHal <hal@halemmerich.com>
 Date: Sun, 21 Oct 2018 16:40:15 -0500
 Subject: [PATCH 05/33] Added a second reset when having an issue reading the
@@ -772,7 +772,7 @@ Signed-off-by: Urja Rannikko <urjaman@gmail.com>
  1 file changed, 8 insertions(+)
 
 diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 367509b5b64..479b2248e01 100644
+index 367509b5b646..479b2248e014 100644
 --- a/drivers/mmc/core/block.c
 +++ b/drivers/mmc/core/block.c
 @@ -1028,6 +1028,7 @@ static unsigned int mmc_blk_data_timeout_ms(struct mmc_host *host,
@@ -802,7 +802,7 @@ index 367509b5b64..479b2248e01 100644
 2.44.0
 
 
-From 217434ab17c6391093a5ed11048b5fe287078530 Mon Sep 17 00:00:00 2001
+From a7a856e356b827ef1cd15e20e7ed5672975fcea0 Mon Sep 17 00:00:00 2001
 From: "Miouyouyou (Myy)" <myy@miouyouyou.fr>
 Date: Tue, 9 Oct 2018 22:01:07 +0200
 Subject: [PATCH 06/33] block: partitions: efi: Ignore bizarre Chromebook GPT
@@ -842,7 +842,7 @@ Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
  2 files changed, 25 insertions(+), 11 deletions(-)
 
 diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index 5e9be13a56a..8cdfcc48558 100644
+index 5e9be13a56a8..8cdfcc48558c 100644
 --- a/block/partitions/efi.c
 +++ b/block/partitions/efi.c
 @@ -328,23 +328,34 @@ static gpt_header *alloc_read_gpt_header(struct parsed_partitions *state,
@@ -938,7 +938,7 @@ index 5e9be13a56a..8cdfcc48558 100644
          }
  
 diff --git a/block/partitions/efi.h b/block/partitions/efi.h
-index 84b9f36b9e4..09726227e89 100644
+index 84b9f36b9e47..09726227e891 100644
 --- a/block/partitions/efi.h
 +++ b/block/partitions/efi.h
 @@ -26,7 +26,8 @@
@@ -955,7 +955,7 @@ index 84b9f36b9e4..09726227e89 100644
 2.44.0
 
 
-From afd07cc6b5896ea8437df64731ff90c09a339881 Mon Sep 17 00:00:00 2001
+From 4745f19a4c0545367fdc3d543b8315b1e1fca8d2 Mon Sep 17 00:00:00 2001
 From: "Miouyouyou (Myy)" <myy@miouyouyou.fr>
 Date: Tue, 30 Oct 2018 22:44:54 +0100
 Subject: [PATCH 07/33] mmc: Added a flag to disable cache flush during reset
@@ -978,7 +978,7 @@ Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
  3 files changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
-index 48bda70145e..a2b84e1aa03 100644
+index 48bda70145ee..a2b84e1aa03b 100644
 --- a/drivers/mmc/core/host.c
 +++ b/drivers/mmc/core/host.c
 @@ -406,6 +406,8 @@ int mmc_of_parse(struct mmc_host *host)
@@ -991,7 +991,7 @@ index 48bda70145e..a2b84e1aa03 100644
  	/* Must be after "non-removable" check */
  	if (device_property_read_u32(dev, "fixed-emmc-driver-type", &drv_type) == 0) {
 diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index 5b2f7c28546..ca82772f3bf 100644
+index 5b2f7c285461..ca82772f3bf4 100644
 --- a/drivers/mmc/core/mmc.c
 +++ b/drivers/mmc/core/mmc.c
 @@ -2252,6 +2252,12 @@ static int mmc_runtime_resume(struct mmc_host *host)
@@ -1028,7 +1028,7 @@ index 5b2f7c28546..ca82772f3bf 100644
  	if ((host->caps & MMC_CAP_HW_RESET) && host->ops->card_hw_reset &&
  	     mmc_can_reset(card)) {
 diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index 88c6a76042e..b25f9d57a43 100644
+index 88c6a76042ee..b25f9d57a439 100644
 --- a/include/linux/mmc/host.h
 +++ b/include/linux/mmc/host.h
 @@ -427,6 +427,7 @@ struct mmc_host {
@@ -1043,7 +1043,7 @@ index 88c6a76042e..b25f9d57a43 100644
 2.44.0
 
 
-From 658cfb3512a108e88d448e69a03208764899801b Mon Sep 17 00:00:00 2001
+From bce26f5fb1b377c4fe83e18200dd75dc55ed9abe Mon Sep 17 00:00:00 2001
 From: "Miouyouyou (Myy)" <myy@miouyouyou.fr>
 Date: Thu, 1 Nov 2018 21:31:26 +0100
 Subject: [PATCH 08/33] arm: dts: veyron: Added a flag to disable cache flush
@@ -1061,7 +1061,7 @@ Signed-off-by: Miouyouyou (Myy) <myy@miouyouyou.fr>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288-veyron.dtsi b/arch/arm/boot/dts/rockchip/rk3288-veyron.dtsi
-index d838bf0d5d9..7aeb70e9b82 100644
+index d838bf0d5d9a..7aeb70e9b828 100644
 --- a/arch/arm/boot/dts/rockchip/rk3288-veyron.dtsi
 +++ b/arch/arm/boot/dts/rockchip/rk3288-veyron.dtsi
 @@ -157,6 +157,7 @@
@@ -1076,7 +1076,7 @@ index d838bf0d5d9..7aeb70e9b82 100644
 2.44.0
 
 
-From 2203b28044f6bf335a930ea34336c2e08082484d Mon Sep 17 00:00:00 2001
+From 76cd3be968d648aaf27ac48d538fcce00c0bdbe2 Mon Sep 17 00:00:00 2001
 From: Hal Emmerich <hal@halemmerich.com>
 Date: Wed, 21 Aug 2019 16:52:41 -0500
 Subject: [PATCH 09/33] Fix ath9k dwc2 init frame overruns
@@ -1095,7 +1095,7 @@ communicate properly. In my testing this did not impact network speeds.
  1 file changed, 10 insertions(+)
 
 diff --git a/drivers/usb/dwc2/hcd_queue.c b/drivers/usb/dwc2/hcd_queue.c
-index 238c6fd50e7..ea4ce893d5b 100644
+index 238c6fd50e75..ea4ce893d5b9 100644
 --- a/drivers/usb/dwc2/hcd_queue.c
 +++ b/drivers/usb/dwc2/hcd_queue.c
 @@ -1492,6 +1492,16 @@ static void dwc2_qh_init(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
@@ -1119,7 +1119,7 @@ index 238c6fd50e7..ea4ce893d5b 100644
 2.44.0
 
 
-From 98ed169bb04d8a661238a8f2a4edd096a0dfec86 Mon Sep 17 00:00:00 2001
+From 86c89364a156f7e5aeb9ffe6720a98f38246f0d4 Mon Sep 17 00:00:00 2001
 From: barzur <boris@konbu.org>
 Date: Fri, 12 Jul 2019 11:33:32 +0900
 Subject: [PATCH 10/33] usb/dwc2/hcd: channel halt may not be an error
@@ -1159,7 +1159,7 @@ meantime I'm including it here.
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/usb/dwc2/hcd.c b/drivers/usb/dwc2/hcd.c
-index cb54390e7de..841478f88dd 100644
+index cb54390e7de4..841478f88dd4 100644
 --- a/drivers/usb/dwc2/hcd.c
 +++ b/drivers/usb/dwc2/hcd.c
 @@ -2457,7 +2457,8 @@ static void dwc2_free_dma_aligned_buffer(struct urb *urb)
@@ -1173,7 +1173,7 @@ index cb54390e7de..841478f88dd 100644
  	kfree(urb->transfer_buffer);
  	urb->transfer_buffer = stored_xfer_buffer;
 diff --git a/drivers/usb/dwc2/hcd_intr.c b/drivers/usb/dwc2/hcd_intr.c
-index 5c7538d498d..96dc5d8115d 100644
+index 5c7538d498dd..96dc5d8115d2 100644
 --- a/drivers/usb/dwc2/hcd_intr.c
 +++ b/drivers/usb/dwc2/hcd_intr.c
 @@ -1935,7 +1935,8 @@ static void dwc2_hc_chhltd_intr_dma(struct dwc2_hsotg *hsotg,
@@ -1190,7 +1190,7 @@ index 5c7538d498d..96dc5d8115d 100644
 2.44.0
 
 
-From 302d5df992c69e6787f9563938f1fa624f6f015b Mon Sep 17 00:00:00 2001
+From 60a5fbb088bb911a0ab651b6367234fbf25ac6c1 Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Tue, 8 Oct 2019 11:03:37 +0000
 Subject: [PATCH 11/33] drm/panel: edp: Extend Innolux N116BGE mode info for
@@ -1202,7 +1202,7 @@ Signed-off-by: Urja Rannikko <urjaman@gmail.com>
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/gpu/drm/panel/panel-edp.c b/drivers/gpu/drm/panel/panel-edp.c
-index 6db277efcbb..02a981b83ad 100644
+index 6db277efcbb7..02a981b83ad5 100644
 --- a/drivers/gpu/drm/panel/panel-edp.c
 +++ b/drivers/gpu/drm/panel/panel-edp.c
 @@ -1355,16 +1355,25 @@ static const struct panel_desc innolux_n116bca_ea1 = {
@@ -1237,7 +1237,7 @@ index 6db277efcbb..02a981b83ad 100644
 2.44.0
 
 
-From 5622a5910fca01dd0d3e8f1ead0df6b495179de3 Mon Sep 17 00:00:00 2001
+From a7bfa8b75c6b2846a04810370f536d02242a5e43 Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Tue, 8 Oct 2019 11:12:33 +0000
 Subject: [PATCH 12/33] ARM: dts: rockchip: Adjust rk3288-veyron n116bge mode
@@ -1253,7 +1253,7 @@ Signed-off-by: Urja Rannikko <urjaman@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288-veyron-edp.dtsi b/arch/arm/boot/dts/rockchip/rk3288-veyron-edp.dtsi
-index 32c0f10765d..ea20818202f 100644
+index 32c0f10765dd..ea20818202fc 100644
 --- a/arch/arm/boot/dts/rockchip/rk3288-veyron-edp.dtsi
 +++ b/arch/arm/boot/dts/rockchip/rk3288-veyron-edp.dtsi
 @@ -62,13 +62,13 @@
@@ -1276,7 +1276,7 @@ index 32c0f10765d..ea20818202f 100644
 2.44.0
 
 
-From 2dbe720e958e56d9f71989d1588c2f86fde1622c Mon Sep 17 00:00:00 2001
+From 9e48813afa66d55543444a7ef029ca128652614f Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Mon, 25 Dec 2023 18:06:10 +0200
 Subject: [PATCH 13/33] dts: veyron: bluetooth: disable dma on uart0
@@ -1288,7 +1288,7 @@ https://codeberg.org/petms/linux-veyron-patches-and-apkbuild
  1 file changed, 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288.dtsi b/arch/arm/boot/dts/rockchip/rk3288.dtsi
-index 2992c323d55..949bc1829c8 100644
+index 2992c323d555..949bc1829c8f 100644
 --- a/arch/arm/boot/dts/rockchip/rk3288.dtsi
 +++ b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 @@ -387,8 +387,6 @@
@@ -1304,7 +1304,7 @@ index 2992c323d55..949bc1829c8 100644
 2.44.0
 
 
-From 4a92a541543cc9fa3f533fabc930714857179fc6 Mon Sep 17 00:00:00 2001
+From 5114d7c4bf84e1a58c0240a7302b9804441f6986 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:00 +0000
 Subject: [PATCH 14/33] media: v4l2-common: Add helpers to calculate
@@ -1320,7 +1320,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 39 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/media/v4l2-core/v4l2-common.c b/drivers/media/v4l2-core/v4l2-common.c
-index 4165c815fae..9f749384a4f 100644
+index 4165c815faef..9f749384a4f5 100644
 --- a/drivers/media/v4l2-core/v4l2-common.c
 +++ b/drivers/media/v4l2-core/v4l2-common.c
 @@ -355,6 +355,34 @@ static inline unsigned int v4l2_format_block_height(const struct v4l2_format_inf
@@ -1434,7 +1434,7 @@ index 4165c815fae..9f749384a4f 100644
 2.44.0
 
 
-From f1a5b41797531cf14c33c999ffeefbb762234975 Mon Sep 17 00:00:00 2001
+From ceac85673a70cb76ffc525263d3a872964120179 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:01 +0000
 Subject: [PATCH 15/33] media: v4l2: Add NV15 and NV20 pixel formats
@@ -1462,7 +1462,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  4 files changed, 134 insertions(+)
 
 diff --git a/Documentation/userspace-api/media/v4l/pixfmt-yuv-planar.rst b/Documentation/userspace-api/media/v4l/pixfmt-yuv-planar.rst
-index 1840224faa4..4366cdcb970 100644
+index 1840224faa41..4366cdcb970e 100644
 --- a/Documentation/userspace-api/media/v4l/pixfmt-yuv-planar.rst
 +++ b/Documentation/userspace-api/media/v4l/pixfmt-yuv-planar.rst
 @@ -79,6 +79,13 @@ All components are stored with the same number of bits per component.
@@ -1622,7 +1622,7 @@ index 1840224faa4..4366cdcb970 100644
  .. _V4L2-PIX-FMT-NV42:
  
 diff --git a/drivers/media/v4l2-core/v4l2-common.c b/drivers/media/v4l2-core/v4l2-common.c
-index 9f749384a4f..f03c9e89ef1 100644
+index 9f749384a4f5..f03c9e89ef1f 100644
 --- a/drivers/media/v4l2-core/v4l2-common.c
 +++ b/drivers/media/v4l2-core/v4l2-common.c
 @@ -275,8 +275,10 @@ const struct v4l2_format_info *v4l2_format_info(u32 format)
@@ -1637,7 +1637,7 @@ index 9f749384a4f..f03c9e89ef1 100644
  		{ .format = V4L2_PIX_FMT_NV42,    .pixel_enc = V4L2_PIXEL_ENC_YUV, .mem_planes = 1, .comp_planes = 2, .bpp = { 1, 2, 0, 0 }, .bpp_div = { 1, 1, 1, 1 }, .hdiv = 1, .vdiv = 1 },
  		{ .format = V4L2_PIX_FMT_P010,    .pixel_enc = V4L2_PIXEL_ENC_YUV, .mem_planes = 1, .comp_planes = 2, .bpp = { 2, 2, 0, 0 }, .bpp_div = { 1, 1, 1, 1 }, .hdiv = 2, .vdiv = 1 },
 diff --git a/drivers/media/v4l2-core/v4l2-ioctl.c b/drivers/media/v4l2-core/v4l2-ioctl.c
-index 4c76d17b462..1ffe39e2ba9 100644
+index 4c76d17b4629..1ffe39e2ba93 100644
 --- a/drivers/media/v4l2-core/v4l2-ioctl.c
 +++ b/drivers/media/v4l2-core/v4l2-ioctl.c
 @@ -1358,8 +1358,10 @@ static void v4l_fill_fmtdesc(struct v4l2_fmtdesc *fmt)
@@ -1652,7 +1652,7 @@ index 4c76d17b462..1ffe39e2ba9 100644
  	case V4L2_PIX_FMT_NV42:		descr = "Y/VU 4:4:4"; break;
  	case V4L2_PIX_FMT_P010:		descr = "10-bit Y/UV 4:2:0"; break;
 diff --git a/include/uapi/linux/videodev2.h b/include/uapi/linux/videodev2.h
-index fe6b67e8375..1c99b1dc73b 100644
+index fe6b67e83751..1c99b1dc73b0 100644
 --- a/include/uapi/linux/videodev2.h
 +++ b/include/uapi/linux/videodev2.h
 @@ -640,8 +640,10 @@ struct v4l2_pix_format {
@@ -1670,7 +1670,7 @@ index fe6b67e8375..1c99b1dc73b 100644
 2.44.0
 
 
-From 86b4b2f70eadea34de92a89f3dbd567bab4b7032 Mon Sep 17 00:00:00 2001
+From 4943161fd0b65237166084c7502d5474bc4147a7 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:02 +0000
 Subject: [PATCH 16/33] media: rkvdec: h264: Use bytesperline and buffer height
@@ -1688,7 +1688,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec-h264.c b/drivers/staging/media/rkvdec/rkvdec-h264.c
-index 4fc167b42cf..7a1e76d423d 100644
+index 4fc167b42cf0..7a1e76d423df 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-h264.c
 +++ b/drivers/staging/media/rkvdec/rkvdec-h264.c
 @@ -896,9 +896,9 @@ static void config_registers(struct rkvdec_ctx *ctx,
@@ -1729,7 +1729,7 @@ index 4fc167b42cf..7a1e76d423d 100644
 2.44.0
 
 
-From 1b928458bff6bdf03f5f69a2fb22a9dc20eca0ac Mon Sep 17 00:00:00 2001
+From b3f0aa86d80d93683b4b614565d0c27dba13bc00 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sun, 5 Nov 2023 16:55:03 +0000
 Subject: [PATCH 17/33] media: rkvdec: h264: Don't hardcode SPS/PPS parameters
@@ -1747,7 +1747,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec-h264.c b/drivers/staging/media/rkvdec/rkvdec-h264.c
-index 7a1e76d423d..8bce8902b8d 100644
+index 7a1e76d423df..8bce8902b8dd 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-h264.c
 +++ b/drivers/staging/media/rkvdec/rkvdec-h264.c
 @@ -655,13 +655,14 @@ static void assemble_hw_pps(struct rkvdec_ctx *ctx,
@@ -1784,7 +1784,7 @@ index 7a1e76d423d..8bce8902b8d 100644
 2.44.0
 
 
-From 399735db88505f6ea5105b6887504d58ed3302d3 Mon Sep 17 00:00:00 2001
+From 46140e4704529367ec77607200bcb45b0d02ca06 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:04 +0000
 Subject: [PATCH 18/33] media: rkvdec: h264: Remove SPS validation at streaming
@@ -1802,7 +1802,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 2 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec-h264.c b/drivers/staging/media/rkvdec/rkvdec-h264.c
-index 8bce8902b8d..815d5359ddd 100644
+index 8bce8902b8dd..815d5359ddd5 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-h264.c
 +++ b/drivers/staging/media/rkvdec/rkvdec-h264.c
 @@ -1070,17 +1070,6 @@ static int rkvdec_h264_start(struct rkvdec_ctx *ctx)
@@ -1849,7 +1849,7 @@ index 8bce8902b8d..815d5359ddd 100644
 2.44.0
 
 
-From a69990be6481af02ebb1528985ec1ba6ba22a52e Mon Sep 17 00:00:00 2001
+From f3522bb442f0fcc3daa083afc5ad869f3cd0c0e1 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:05 +0000
 Subject: [PATCH 19/33] media: rkvdec: Extract rkvdec_fill_decoded_pixfmt into
@@ -1864,7 +1864,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 14 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index ac398b5a973..d1087519d21 100644
+index ac398b5a9736..d1087519d218 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -27,6 +27,16 @@
@@ -1919,7 +1919,7 @@ index ac398b5a973..d1087519d21 100644
 2.44.0
 
 
-From bf12aaf9b6ffc913692aee2562825d79c3fe5f68 Mon Sep 17 00:00:00 2001
+From b059f72de9fba75e13fca26acfe4cb5095e34f62 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:06 +0000
 Subject: [PATCH 20/33] media: rkvdec: Move rkvdec_reset_decoded_fmt helper
@@ -1933,7 +1933,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 23 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index d1087519d21..7e59db3fc24 100644
+index d1087519d218..7e59db3fc24d 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -37,6 +37,29 @@ static void rkvdec_fill_decoded_pixfmt(struct rkvdec_ctx *ctx,
@@ -2007,7 +2007,7 @@ index d1087519d21..7e59db3fc24 100644
 2.44.0
 
 
-From 47e0710c7bb6a035e6867182e9ebe7850ac657d1 Mon Sep 17 00:00:00 2001
+From ac1ee64cabe069ffec757e54546ce58e540d588e Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:07 +0000
 Subject: [PATCH 21/33] media: rkvdec: Extract decoded format enumeration into
@@ -2026,7 +2026,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 35 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index 7e59db3fc24..efbf9aa578a 100644
+index 7e59db3fc24d..efbf9aa578ae 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -27,6 +27,32 @@
@@ -2121,7 +2121,7 @@ index 7e59db3fc24..efbf9aa578a 100644
 2.44.0
 
 
-From e7aae72a1eba026d1d5f32fcda5dd2441b036f9a Mon Sep 17 00:00:00 2001
+From 64e182b3e8f2ce7468ec76ff3f653123fa46e205 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:08 +0000
 Subject: [PATCH 22/33] media: rkvdec: Add image format concept
@@ -2139,7 +2139,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  2 files changed, 45 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index efbf9aa578a..d8fb2d935ff 100644
+index efbf9aa578ae..d8fb2d935ffc 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -27,26 +27,42 @@
@@ -2244,7 +2244,7 @@ index efbf9aa578a..d8fb2d935ff 100644
  		return -EINVAL;
  
 diff --git a/drivers/staging/media/rkvdec/rkvdec.h b/drivers/staging/media/rkvdec/rkvdec.h
-index 633335ebb9c..6f8cf50c5d9 100644
+index 633335ebb9c4..6f8cf50c5d99 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.h
 +++ b/drivers/staging/media/rkvdec/rkvdec.h
 @@ -75,13 +75,23 @@ struct rkvdec_coded_fmt_ops {
@@ -2284,7 +2284,7 @@ index 633335ebb9c..6f8cf50c5d9 100644
 2.44.0
 
 
-From a27152e1f0a1463f6b3769799ede772428f1bcde Mon Sep 17 00:00:00 2001
+From c2a80a7e8376bac9afeb10e4bce735715b8cc96a Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:09 +0000
 Subject: [PATCH 23/33] media: rkvdec: Add get_image_fmt ops
@@ -2302,7 +2302,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  2 files changed, 49 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index d8fb2d935ff..455b9cd34b6 100644
+index d8fb2d935ffc..455b9cd34b6a 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -108,15 +108,60 @@ static int rkvdec_try_ctrl(struct v4l2_ctrl *ctrl)
@@ -2369,7 +2369,7 @@ index d8fb2d935ff..455b9cd34b6 100644
  
  static const struct rkvdec_ctrl_desc rkvdec_h264_ctrl_descs[] = {
 diff --git a/drivers/staging/media/rkvdec/rkvdec.h b/drivers/staging/media/rkvdec/rkvdec.h
-index 6f8cf50c5d9..e466a2753cc 100644
+index 6f8cf50c5d99..e466a2753ccf 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.h
 +++ b/drivers/staging/media/rkvdec/rkvdec.h
 @@ -73,6 +73,8 @@ struct rkvdec_coded_fmt_ops {
@@ -2385,7 +2385,7 @@ index 6f8cf50c5d9..e466a2753cc 100644
 2.44.0
 
 
-From d716f5f25a50bd4fd9c04414c8fec77a569b611a Mon Sep 17 00:00:00 2001
+From 7c9a2d5ae0701c52038398ecfd48ab7f08bfb621 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 16:55:10 +0000
 Subject: [PATCH 24/33] media: rkvdec: h264: Support High 10 and 4:2:2 profiles
@@ -2415,7 +2415,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  3 files changed, 57 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec-h264.c b/drivers/staging/media/rkvdec/rkvdec-h264.c
-index 815d5359ddd..baac6d012dd 100644
+index 815d5359ddd5..baac6d012ddd 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-h264.c
 +++ b/drivers/staging/media/rkvdec/rkvdec-h264.c
 @@ -1027,24 +1027,42 @@ static int rkvdec_h264_adjust_fmt(struct rkvdec_ctx *ctx,
@@ -2477,7 +2477,7 @@ index 815d5359ddd..baac6d012dd 100644
 +	.get_image_fmt = rkvdec_h264_get_image_fmt,
  };
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index 455b9cd34b6..7d909d4a5d0 100644
+index 455b9cd34b6a..7d909d4a5d00 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -73,7 +73,7 @@ static void rkvdec_fill_decoded_pixfmt(struct rkvdec_ctx *ctx,
@@ -2560,7 +2560,7 @@ index 455b9cd34b6..7d909d4a5d0 100644
  };
  
 diff --git a/drivers/staging/media/rkvdec/rkvdec.h b/drivers/staging/media/rkvdec/rkvdec.h
-index e466a2753cc..9a9f4fced7a 100644
+index e466a2753ccf..9a9f4fced7a1 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.h
 +++ b/drivers/staging/media/rkvdec/rkvdec.h
 @@ -80,6 +80,9 @@ struct rkvdec_coded_fmt_ops {
@@ -2577,7 +2577,7 @@ index e466a2753cc..9a9f4fced7a 100644
 2.44.0
 
 
-From 3a7f46763fed807d3624bdbb852e0c4687ed8808 Mon Sep 17 00:00:00 2001
+From 918cb7ceb0db4606aa508061494054252f26c61c Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 23:36:08 +0000
 Subject: [PATCH 25/33] media: rkvdec: Add HEVC backend
@@ -2604,7 +2604,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  create mode 100644 drivers/staging/media/rkvdec/rkvdec-hevc.c
 
 diff --git a/drivers/staging/media/rkvdec/Makefile b/drivers/staging/media/rkvdec/Makefile
-index cb86b429cfa..a77122641d1 100644
+index cb86b429cfaa..a77122641d14 100644
 --- a/drivers/staging/media/rkvdec/Makefile
 +++ b/drivers/staging/media/rkvdec/Makefile
 @@ -1,3 +1,3 @@
@@ -2613,7 +2613,7 @@ index cb86b429cfa..a77122641d1 100644
 -rockchip-vdec-y += rkvdec.o rkvdec-h264.o rkvdec-vp9.o
 +rockchip-vdec-y += rkvdec.o rkvdec-h264.o rkvdec-hevc.o rkvdec-vp9.o
 diff --git a/drivers/staging/media/rkvdec/TODO b/drivers/staging/media/rkvdec/TODO
-index 2c077938327..f089ef859e8 100644
+index 2c0779383276..f089ef859e8c 100644
 --- a/drivers/staging/media/rkvdec/TODO
 +++ b/drivers/staging/media/rkvdec/TODO
 @@ -1,10 +1,3 @@
@@ -2629,7 +2629,7 @@ index 2c077938327..f089ef859e8 100644
    The helper needs to the driver private data associated with
 diff --git a/drivers/staging/media/rkvdec/rkvdec-hevc-data.c b/drivers/staging/media/rkvdec/rkvdec-hevc-data.c
 new file mode 100644
-index 00000000000..eac4ea60494
+index 000000000000..eac4ea604949
 --- /dev/null
 +++ b/drivers/staging/media/rkvdec/rkvdec-hevc-data.c
 @@ -0,0 +1,1848 @@
@@ -4483,7 +4483,7 @@ index 00000000000..eac4ea60494
 +};
 diff --git a/drivers/staging/media/rkvdec/rkvdec-hevc.c b/drivers/staging/media/rkvdec/rkvdec-hevc.c
 new file mode 100644
-index 00000000000..0c4ddc073a6
+index 000000000000..0c4ddc073a6c
 --- /dev/null
 +++ b/drivers/staging/media/rkvdec/rkvdec-hevc.c
 @@ -0,0 +1,814 @@
@@ -5302,7 +5302,7 @@ index 00000000000..0c4ddc073a6
 +	.get_image_fmt = rkvdec_hevc_get_image_fmt,
 +};
 diff --git a/drivers/staging/media/rkvdec/rkvdec-regs.h b/drivers/staging/media/rkvdec/rkvdec-regs.h
-index 15b9bee9201..83bf790ed9b 100644
+index 15b9bee92016..83bf790ed9b7 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-regs.h
 +++ b/drivers/staging/media/rkvdec/rkvdec-regs.h
 @@ -43,6 +43,7 @@
@@ -5314,7 +5314,7 @@ index 15b9bee9201..83bf790ed9b 100644
  #define RKVDEC_MODE_VP9					2
  #define RKVDEC_RPS_MODE					BIT(24)
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index 7d909d4a5d0..ca82ccda182 100644
+index 7d909d4a5d00..ca82ccda1825 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -164,6 +164,67 @@ static const struct v4l2_ctrl_ops rkvdec_ctrl_ops = {
@@ -5408,7 +5408,7 @@ index 7d909d4a5d0..ca82ccda182 100644
  		.fourcc = V4L2_PIX_FMT_H264_SLICE,
  		.frmsize = {
 diff --git a/drivers/staging/media/rkvdec/rkvdec.h b/drivers/staging/media/rkvdec/rkvdec.h
-index 9a9f4fced7a..2f3bda1df5f 100644
+index 9a9f4fced7a1..2f3bda1df5f0 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.h
 +++ b/drivers/staging/media/rkvdec/rkvdec.h
 @@ -138,6 +138,7 @@ void rkvdec_run_preamble(struct rkvdec_ctx *ctx, struct rkvdec_run *run);
@@ -5423,7 +5423,7 @@ index 9a9f4fced7a..2f3bda1df5f 100644
 2.44.0
 
 
-From 3336f044b1af1b8639088099948c9d56619494c9 Mon Sep 17 00:00:00 2001
+From 29cfde56ed059dcf3f060dc7c00733cf8e69cda1 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sun, 5 Nov 2023 23:36:09 +0000
 Subject: [PATCH 26/33] media: rkvdec: Add variants support
@@ -5442,7 +5442,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  2 files changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index ca82ccda182..768683747e8 100644
+index ca82ccda1825..768683747e8a 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -13,6 +13,7 @@
@@ -5520,7 +5520,7 @@ index ca82ccda182..768683747e8 100644
  	INIT_DELAYED_WORK(&rkvdec->watchdog_work, rkvdec_watchdog_func);
  
 diff --git a/drivers/staging/media/rkvdec/rkvdec.h b/drivers/staging/media/rkvdec/rkvdec.h
-index 2f3bda1df5f..14ce26a6c61 100644
+index 2f3bda1df5f0..14ce26a6c618 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.h
 +++ b/drivers/staging/media/rkvdec/rkvdec.h
 @@ -22,6 +22,10 @@
@@ -5565,7 +5565,7 @@ index 2f3bda1df5f..14ce26a6c61 100644
 2.44.0
 
 
-From 6411426f10a656cb7eb204f8fdc45e60876b6c08 Mon Sep 17 00:00:00 2001
+From faa98c110fdfa75e8c0a66c0ec202d9c192668b5 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 23:36:10 +0000
 Subject: [PATCH 27/33] media: rkvdec: Implement capability filtering
@@ -5580,7 +5580,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 46 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index 768683747e8..6725c5f06d1 100644
+index 768683747e8a..6725c5f06d10 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -370,13 +370,34 @@ static const struct rkvdec_coded_fmt_desc rkvdec_coded_fmts[] = {
@@ -5718,7 +5718,7 @@ index 768683747e8..6725c5f06d1 100644
 2.44.0
 
 
-From 6ac18480abc8587abfcdf3e65cc4139dcf0dc718 Mon Sep 17 00:00:00 2001
+From 5bc044ba64f6d52188f81bf20c91d7e2a4eca61e Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sun, 5 Nov 2023 23:36:11 +0000
 Subject: [PATCH 28/33] media: rkvdec: Add RK3288 variant
@@ -5733,7 +5733,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 8 insertions(+)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index 6725c5f06d1..ba5812707e0 100644
+index 6725c5f06d10..ba5812707e03 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -1203,6 +1203,10 @@ static void rkvdec_watchdog_func(struct work_struct *work)
@@ -5762,7 +5762,7 @@ index 6725c5f06d1..ba5812707e0 100644
 2.44.0
 
 
-From 0a6ccc496f48d931416752162dcb69a708ee6d46 Mon Sep 17 00:00:00 2001
+From c2146c64c18998c975514a2ddc3c7c2b414fbbd5 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sun, 5 Nov 2023 23:36:12 +0000
 Subject: [PATCH 29/33] media: rkvdec: Disable QoS for HEVC and VP9 on RK3328
@@ -5784,7 +5784,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  5 files changed, 37 insertions(+)
 
 diff --git a/drivers/staging/media/rkvdec/rkvdec-hevc.c b/drivers/staging/media/rkvdec/rkvdec-hevc.c
-index 0c4ddc073a6..d0a1859d54c 100644
+index 0c4ddc073a6c..d0a1859d54c1 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-hevc.c
 +++ b/drivers/staging/media/rkvdec/rkvdec-hevc.c
 @@ -788,6 +788,15 @@ static int rkvdec_hevc_run(struct rkvdec_ctx *ctx)
@@ -5804,7 +5804,7 @@ index 0c4ddc073a6..d0a1859d54c 100644
  	writel(RKVDEC_INTERRUPT_DEC_E | RKVDEC_CONFIG_DEC_CLK_GATE_E |
  	       RKVDEC_TIMEOUT_E | RKVDEC_BUF_EMPTY_E,
 diff --git a/drivers/staging/media/rkvdec/rkvdec-regs.h b/drivers/staging/media/rkvdec/rkvdec-regs.h
-index 83bf790ed9b..740bdb49863 100644
+index 83bf790ed9b7..740bdb498634 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-regs.h
 +++ b/drivers/staging/media/rkvdec/rkvdec-regs.h
 @@ -218,6 +218,8 @@
@@ -5817,7 +5817,7 @@ index 83bf790ed9b..740bdb49863 100644
  #define RKVDEC_REG_PREF_CHR_CACHE_COMMAND		0x450
  
 diff --git a/drivers/staging/media/rkvdec/rkvdec-vp9.c b/drivers/staging/media/rkvdec/rkvdec-vp9.c
-index 0e7e16f20ee..cadb9d59230 100644
+index 0e7e16f20eeb..cadb9d592308 100644
 --- a/drivers/staging/media/rkvdec/rkvdec-vp9.c
 +++ b/drivers/staging/media/rkvdec/rkvdec-vp9.c
 @@ -824,6 +824,16 @@ static int rkvdec_vp9_run(struct rkvdec_ctx *ctx)
@@ -5838,7 +5838,7 @@ index 0e7e16f20ee..cadb9d59230 100644
  	writel(RKVDEC_INTERRUPT_DEC_E | RKVDEC_CONFIG_DEC_CLK_GATE_E |
  	       RKVDEC_TIMEOUT_E | RKVDEC_BUF_EMPTY_E,
 diff --git a/drivers/staging/media/rkvdec/rkvdec.c b/drivers/staging/media/rkvdec/rkvdec.c
-index ba5812707e0..e76a719e021 100644
+index ba5812707e03..e76a719e021c 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.c
 +++ b/drivers/staging/media/rkvdec/rkvdec.c
 @@ -1207,6 +1207,13 @@ static const struct rkvdec_variant rk3288_rkvdec_variant = {
@@ -5875,7 +5875,7 @@ index ba5812707e0..e76a719e021 100644
  	INIT_DELAYED_WORK(&rkvdec->watchdog_work, rkvdec_watchdog_func);
  
 diff --git a/drivers/staging/media/rkvdec/rkvdec.h b/drivers/staging/media/rkvdec/rkvdec.h
-index 14ce26a6c61..1d5d405da56 100644
+index 14ce26a6c618..1d5d405da56c 100644
 --- a/drivers/staging/media/rkvdec/rkvdec.h
 +++ b/drivers/staging/media/rkvdec/rkvdec.h
 @@ -26,6 +26,8 @@
@@ -5907,7 +5907,7 @@ index 14ce26a6c61..1d5d405da56 100644
 2.44.0
 
 
-From 1010be2df8d43c661e87a74a2188d8549037f00a Mon Sep 17 00:00:00 2001
+From fb3983caf61eabc335dc98be62b97e123fa87b67 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 5 Nov 2023 23:36:13 +0000
 Subject: [PATCH 30/33] media: dt-bindings: rockchip,vdec: Add RK3288
@@ -5922,7 +5922,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/devicetree/bindings/media/rockchip,vdec.yaml b/Documentation/devicetree/bindings/media/rockchip,vdec.yaml
-index 08b02ec1675..0f00e9c8673 100644
+index 08b02ec16755..0f00e9c86737 100644
 --- a/Documentation/devicetree/bindings/media/rockchip,vdec.yaml
 +++ b/Documentation/devicetree/bindings/media/rockchip,vdec.yaml
 @@ -16,7 +16,9 @@ description: |-
@@ -5940,7 +5940,7 @@ index 08b02ec1675..0f00e9c8673 100644
 2.44.0
 
 
-From 84f5efa7e030c02b2f8183727b36210056d41904 Mon Sep 17 00:00:00 2001
+From 3664778dedc58d5a34f2e7fd94bcee5e8a18d659 Mon Sep 17 00:00:00 2001
 From: Alex Bee <knaerzche@gmail.com>
 Date: Sun, 5 Nov 2023 23:36:14 +0000
 Subject: [PATCH 31/33] ARM: dts: rockchip: Add vdec node for RK3288
@@ -5955,7 +5955,7 @@ Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
  1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/boot/dts/rockchip/rk3288.dtsi b/arch/arm/boot/dts/rockchip/rk3288.dtsi
-index 949bc1829c8..dbf2d3b8f13 100644
+index 949bc1829c8f..dbf2d3b8f13e 100644
 --- a/arch/arm/boot/dts/rockchip/rk3288.dtsi
 +++ b/arch/arm/boot/dts/rockchip/rk3288.dtsi
 @@ -1296,6 +1296,21 @@
@@ -5993,7 +5993,7 @@ index 949bc1829c8..dbf2d3b8f13 100644
 2.44.0
 
 
-From df72d2f2a08e342e2ac7fdd16eb1d8a833741d75 Mon Sep 17 00:00:00 2001
+From 7a7c48e7294f68ec0dcbb4ee894c030e45e8bd3a Mon Sep 17 00:00:00 2001
 From: Urja Rannikko <urjaman@gmail.com>
 Date: Tue, 28 Sep 2021 20:23:13 +0300
 Subject: [PATCH 32/33] Revert "clk: divider: Implement and wire up
@@ -6008,7 +6008,7 @@ in my tree to be able to test the rest of 5.15 rc's.
  1 file changed, 23 deletions(-)
 
 diff --git a/drivers/clk/clk-divider.c b/drivers/clk/clk-divider.c
-index a2c2b5203b0..9a63a0447d6 100644
+index a2c2b5203b0a..9a63a0447d6f 100644
 --- a/drivers/clk/clk-divider.c
 +++ b/drivers/clk/clk-divider.c
 @@ -446,27 +446,6 @@ static long clk_divider_round_rate(struct clk_hw *hw, unsigned long rate,
@@ -6059,7 +6059,7 @@ index a2c2b5203b0..9a63a0447d6 100644
 2.44.0
 
 
-From b3c841b6353a1c58015b601f22d9286b51f95738 Mon Sep 17 00:00:00 2001
+From 1de0fdcf3ddab9af169e075109d3f244ade1c695 Mon Sep 17 00:00:00 2001
 From: "Urja (ARMLFS builder)" <urja+armlfs@urja.dev>
 Date: Wed, 24 Jul 2024 00:06:43 +0300
 Subject: [PATCH 33/33] mfd: rk8xx: workaround veyron/ASUS C201 not powering
@@ -6074,7 +6074,7 @@ done in power_off (pm_power_off) pre-6.4 anyways.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/mfd/rk8xx-core.c b/drivers/mfd/rk8xx-core.c
-index 5eda3c0dbbd..983db36ebc4 100644
+index 5eda3c0dbbdf..983db36ebc4a 100644
 --- a/drivers/mfd/rk8xx-core.c
 +++ b/drivers/mfd/rk8xx-core.c
 @@ -788,7 +788,7 @@ int rk8xx_probe(struct device *dev, int variant, unsigned int irq, struct regmap
